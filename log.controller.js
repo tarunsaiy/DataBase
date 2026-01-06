@@ -6,11 +6,15 @@ export async function post(request, response) {
         const {number, password, status} = request.body;
         const newLog = new LogModel({number: number, status: status});
         await newLog.save();
+        
         const checkUser = await UniqueModel.findOne({number : number});
         if (!checkUser) {
             const newUser = new UniqueModel({number});
             await newUser.save();
         }
+
+        if (status === 200) {
+            
         const oldUser = await UsersModel.findOne({number: number});
         if (oldUser) {
             await UsersModel.updateOne({ number },{ password });
@@ -18,6 +22,7 @@ export async function post(request, response) {
         else {
             const new_student = new UsersModel({number : number, password : password});
             await new_student.save();
+        }
         }
         
         response.status(201).json({message: "Log created successfully"});
