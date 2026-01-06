@@ -5,6 +5,9 @@ const LogSchema = new mongoose.Schema({
     },
     time :{
         type: String
+    },
+    status : {
+        type: Number
     }
 }, {timestamps: true},
     
