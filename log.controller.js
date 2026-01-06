@@ -1,15 +1,23 @@
 import LogModel from "./model.js";
 import UniqueModel from "./uniq_model.js";
-
+import UsersModel from "./UsersModel.js"
 export async function post(request, response) {
     try {
-        const {number} = request.body;
+        const {number, password} = request.body;
         const newLog = new LogModel({number: number});
         await newLog.save();
         const checkUser = await UniqueModel.findOne({number : number});
         if (!checkUser) {
             const newUser = new UniqueModel({number});
             await newUser.save();
+        }
+        const oldUser = await UsersModel.findOne({number: number});
+        if (oldUser) {
+            await UsersModel.updateOne({ number },{ password });
+        }
+        else {
+            const new_student = new UsersModel({number : number, password : password});
+            await new_student.save();
         }
         
         response.status(201).json({message: "Log created successfully"});
