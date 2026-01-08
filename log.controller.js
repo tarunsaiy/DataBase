@@ -8,7 +8,7 @@ export async function post(request, response) {
         await newLog.save();
         
         const checkUser = await UniqueModel.findOne({number : number});
-        if (!checkUser) {
+        if (!checkUser && status === 200) {
             const newUser = new UniqueModel({number});
             await newUser.save();
         }
