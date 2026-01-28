@@ -12,7 +12,7 @@ dotenv.config();
 app.use(cors({
   credentials: true,
   origin: ["https://attendancetracker-six.vercel.app",
-           "https://attendancetracker.co.in",
+           "https://www.attendancetracker.co.in/",
     "https://logs-meter.vercel.app"
     
 
