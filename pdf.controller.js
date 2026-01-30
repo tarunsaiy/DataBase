@@ -84,14 +84,37 @@ export const getBySubject = async (req, res) => {
     })
   }
 }
-export const geyBySearch = async (req, res) => {
+export const getBySearch = async (req, res) => {
   try {
-    const {search} = req.params;
-    const pdfs = await PdfModel.find({$text: {$regex: search, $options: 'i'}});
+    const {search} = req.query;
+    const pdfs = await PdfModel.find({
+      $or : [
+        {Branch : {$regex : search, $options : "i"}}, 
+        {Year : {$regex : search, $options : "i"}},
+        {Subject : {$regex : search, $options : "i"}},
+        {Title : {$regex : search, $options : "i"}}
+      ]
+    });
     return res.status(200).json({
       message: "Pdf fetched by search successfully",
       success: true,
       data: pdfs
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      success: false
+    })
+  }
+}
+export const deletePdf = async (req, res) => {
+  try {
+    const {id} = req.body;
+    const pdf = await PdfModel.findByIdAndDelete(id);
+    return res.status(200).json({
+      message: "Pdf deleted successfully",
+      success: true,
+      data: pdf
     });
   } catch (error) {
     return res.status(500).json({
