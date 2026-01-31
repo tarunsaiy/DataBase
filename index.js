@@ -9,16 +9,16 @@ const app = express();
 const port = process.env.port || 8000;
 
 dotenv.config();
-// app.use(cors({
-//   credentials: true,
-//   origin: ["https://attendancetracker-six.vercel.app",
-//            "https://www.attendancetracker.co.in",
-//     "https://logs-meter.vercel.app"
+app.use(cors({
+  credentials: true,
+  origin: ["https://attendancetracker-six.vercel.app",
+           "https://www.attendancetracker.co.in",
+    "https://logs-meter.vercel.app"
     
 
-//   ],
-// }));
-app.use(cors());
+  ],
+}));
+
 app.use(express.json());
 app.use('/', logRouter);
 app.use('/pdf', pdfRouter)
