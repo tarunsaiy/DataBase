@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 const PdfSchema = new mongoose.Schema({
     Branch : {
-        type : String,
+        type : [String],
         required : true
     },
     Year :{
-        type : String,
+        type : [String],
         required : true
     },
     Subject : {
