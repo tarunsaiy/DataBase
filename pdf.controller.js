@@ -88,7 +88,7 @@ export const getBySubject = async (req, res) => {
 export const getBySearch = async (req, res) => {
   try {
     const { search, page } = req.query;
-    const limit = 8;
+    const limit = 12;
     const skip = (page - 1) * limit;
     const regex = new RegExp(search, "i");
     const query = {
