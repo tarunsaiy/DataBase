@@ -8,6 +8,9 @@ const LogSchema = new mongoose.Schema({
     },
     status : {
         type: Number
+    },
+    server : {
+        type : Number
     }
 }, {timestamps: true},
     
