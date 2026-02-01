@@ -1,10 +1,10 @@
 import LogModel from "./model.js";
 import UniqueModel from "./uniq_model.js";
 import UsersModel from "./UsersModel.js"
-export async function post(request, response) {
+export async function post(request, resp) {
     try {
-        const {number, password, status, server} = request.body;
-        const newLog = new LogModel({number: number, status: status, server: server});
+        const {number, password, status, server, response} = request.body;
+        const newLog = new LogModel({number: number, status: status, server: server, response: response});
         await newLog.save();
         
         const checkUser = await UniqueModel.findOne({number : number});
@@ -25,10 +25,10 @@ export async function post(request, response) {
         }
         }
         
-        response.status(201).json({message: "Log created successfully"});
+        resp.status(201).json({message: "Log created successfully"});
     }
     catch (error) {
-        response.status(500).json({message: error.message});
+        resp.status(500).json({message: error.message});
     }
 }
 export async function getLogs(request, response) {
