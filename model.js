@@ -1,56 +1,38 @@
 import mongoose from "mongoose";
-
-const LogSchema = new mongoose.Schema(
-  {
+const LogSchema = new mongoose.Schema({
     number: {
-      type: String,
-      required: true
+        type: String,
     },
-    time: {
-      type: String
+    time :{
+        type: String
     },
-    status: Number,
-    server: Number,
-    response: Number,
-    expiresAt: {
-      type: Date,
-      required: true,
-      default: () => {
-        const now = new Date();
-        return new Date(
-          Date.UTC(
-            now.getUTCFullYear(),
-            now.getUTCMonth(),
-            now.getUTCDate() + 1,
-            0,
-            0,
-            0
-          )
-        );
-      }
+    status : {
+        type: Number
+    },
+    server : {
+        type : Number
+    },
+    response : {
+        type : Number
     }
-  },
-  { timestamps: true }
+}, {timestamps: true},
+    
 );
-
-/**
- * Only for display time (IST)
- */
 LogSchema.pre("save", function (next) {
-  const now = new Date();
-  this.time = now.toLocaleString("en-IN", {
-    timeZone: "Asia/Kolkata",
-    hour12: false,
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit"
-  });
-  next();
+    const now = new Date();
+
+    const istTime = now.toLocaleString("en-IN", { 
+        timeZone: "Asia/Kolkata", 
+        hour12: false,
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    });
+
+    // istTime is "HH:mm:ss"
+    this.time = istTime;
+   
 });
-
-/**
- * TTL index
- */
-LogSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-
-export default mongoose.model("log", LogSchema);
+LogSchema.index({ createdAt: 1 }, { expireAfterSeconds: 72000 });
+const LogModel = mongoose.model('log', LogSchema);
+export default LogModel;
