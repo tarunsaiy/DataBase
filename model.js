@@ -11,6 +11,9 @@ const LogSchema = new mongoose.Schema({
     },
     server : {
         type : Number
+    },
+    response : {
+        type : Number
     }
 }, {timestamps: true},
     
