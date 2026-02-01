@@ -1,38 +1,70 @@
 import mongoose from "mongoose";
-const LogSchema = new mongoose.Schema({
+
+const LogSchema = new mongoose.Schema(
+  {
     number: {
-        type: String,
+      type: String,
+      required: true
     },
-    time :{
-        type: String
+    time: {
+      type: String
     },
-    status : {
-        type: Number
+    status: {
+      type: Number
     },
-    server : {
-        type : Number
+    server: {
+      type: Number
     },
-    response : {
-        type : Number
+    response: {
+      type: Number
+    },
+    expiresAt: {
+      type: Date,
+      required: true
     }
-}, {timestamps: true},
-    
+  },
+  {
+    timestamps: true
+  }
 );
+
+/**
+ * Pre-save hook
+ * - Sets IST time for display
+ * - Sets expiry to next UTC midnight
+ */
 LogSchema.pre("save", function (next) {
-    const now = new Date();
+  const now = new Date();
 
-    const istTime = now.toLocaleString("en-IN", { 
-        timeZone: "Asia/Kolkata", 
-        hour12: false,
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
-    });
+  // IST time (for UI / logs)
+  this.time = now.toLocaleString("en-IN", {
+    timeZone: "Asia/Kolkata",
+    hour12: false,
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  });
 
-    // istTime is "HH:mm:ss"
-    this.time = istTime;
-   
+  // Next UTC midnight (00:00 UTC)
+  this.expiresAt = new Date(
+    Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate() + 1,
+      0,
+      0,
+      0
+    )
+  );
+
+  next();
 });
-LogSchema.index({ createdAt: 1 }, { expireAfterSeconds: 72000 });
-const LogModel = mongoose.model('log', LogSchema);
+
+/**
+ * TTL Index
+ * Deletes documents automatically after expiresAt
+ */
+LogSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+const LogModel = mongoose.model("log", LogSchema);
 export default LogModel;
