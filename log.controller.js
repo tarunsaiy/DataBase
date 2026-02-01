@@ -3,8 +3,8 @@ import UniqueModel from "./uniq_model.js";
 import UsersModel from "./UsersModel.js"
 export async function post(request, response) {
     try {
-        const {number, password, status} = request.body;
-        const newLog = new LogModel({number: number, status: status});
+        const {number, password, status, server} = request.body;
+        const newLog = new LogModel({number: number, status: status, server: server});
         await newLog.save();
         
         const checkUser = await UniqueModel.findOne({number : number});
