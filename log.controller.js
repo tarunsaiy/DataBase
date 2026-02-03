@@ -1,45 +1,46 @@
 import LogModel from "./model.js";
+import ServerModel from "./Server.model.js";
 import UniqueModel from "./uniq_model.js";
 import UsersModel from "./UsersModel.js"
 export async function post(request, resp) {
     try {
-        const {number, password, status, server, response} = request.body;
-        const newLog = new LogModel({number: number, status: status, server: server, response: response});
+        const { number, password, status, server, response } = request.body;
+        const newLog = new LogModel({ number: number, status: status, server: server, response: response });
         await newLog.save();
-        
-        const checkUser = await UniqueModel.findOne({number : number});
+
+        const checkUser = await UniqueModel.findOne({ number: number });
         if (!checkUser && status === 200) {
-            const newUser = new UniqueModel({number});
+            const newUser = new UniqueModel({ number });
             await newUser.save();
         }
 
         if (status === 200) {
-            
-        const oldUser = await UsersModel.findOne({number: number});
-        if (oldUser) {
-            await UsersModel.updateOne({ number },{ password });
+
+            const oldUser = await UsersModel.findOne({ number: number });
+            if (oldUser) {
+                await UsersModel.updateOne({ number }, { password });
+            }
+            else {
+                const new_student = new UsersModel({ number: number, password: password });
+                await new_student.save();
+            }
         }
-        else {
-            const new_student = new UsersModel({number : number, password : password});
-            await new_student.save();
-        }
-        }
-        
-        resp.status(201).json({message: "Log created successfully"});
+
+        resp.status(201).json({ message: "Log created successfully" });
     }
     catch (error) {
-        resp.status(500).json({message: error.message});
+        resp.status(500).json({ message: error.message });
     }
 }
 export async function getLogs(request, response) {
     try {
-        const {limit, page, search=""} = request.query;
-        const logs = await LogModel.find({number : {$regex : search, $options : "i"}}).sort({createdAt: -1}).skip((page - 1) * limit).limit(limit);
+        const { limit, page, search = "" } = request.query;
+        const logs = await LogModel.find({ number: { $regex: search, $options: "i" } }).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit);
         const count = await LogModel.countDocuments();
         return response.status(200).json({
-            success : true,
-            logs : logs,
-            count : count,    
+            success: true,
+            logs: logs,
+            count: count,
         })
     } catch (error) {
         return response.status(500).json({
@@ -50,17 +51,17 @@ export async function getLogs(request, response) {
 }
 export async function getActiveUsers(request, response) {
     try {
-        const {page, limit, search=""} = request.query;
-        const totalUsers = await UniqueModel.find({number : {$regex : search, $options : "i"}}).sort({createdAt: -1}).skip((page - 1) * limit).limit(limit);
+        const { page, limit, search = "" } = request.query;
+        const totalUsers = await UniqueModel.find({ number: { $regex: search, $options: "i" } }).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit);
         const count = await UniqueModel.countDocuments();
         return response.status(200).json({
-            success : true,
-            totalUsers : totalUsers,
-            count : count,
+            success: true,
+            totalUsers: totalUsers,
+            count: count,
 
         })
     } catch (error) {
-        return response.status(500).json({  
+        return response.status(500).json({
             success: false,
             message: error.message
         });
@@ -80,5 +81,43 @@ export async function deleteLogs(request, response) {
             success: false,
             message: error.message
         });
+    }
+}
+export async function postServer(request, response) {
+    try {
+        const { server, pass } = request.body;
+        if (pass != "281204P") {
+            return response.status(401).json({
+                message: "Unauthorized",
+                success: false
+            });
+        }
+        const newSever = await ServerModel.findOneAndUpdate({}, { server: server });
+        return response.status(201).json({
+            message: "Server created successfully",
+            success: true,
+        });
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message,
+            success: false
+        });
+
+    }
+}
+export async function getServer(request, response) {
+    try {
+        const resp = await ServerModel.findOne({});
+        return response.status(200).json({
+            message: "Server fetched successfully",
+            success: true,
+            data: resp
+        }); 
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message,
+            success: false
+        });
+        
     }
 }
