@@ -121,3 +121,66 @@ export async function getServer(request, response) {
         
     }
 }
+export async function postLevel(request, response) {
+    try {
+        const { level, redgNo, password } = request.body;
+
+        const student = await StudentModel.findOneAndUpdate(
+            { number: redgNo, password: password },
+            { level: level },
+            { new: true }
+        );
+
+        if (!student) {
+            return response.status(401).json({
+                message: "Invalid registration number or password",
+                success: false,
+                error: true
+            });
+        }
+
+        return response.status(200).json({
+            message: "Level updated successfully",
+            success: true,
+            error: false
+        });
+
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message,
+            success: false
+        });
+    }
+}
+
+
+export async function getLevel(request, response) {
+    try {
+        const { redgNo, password } = request.query;
+
+        const student = await StudentModel.findOne({
+            number: redgNo,
+            password: password
+        });
+
+        if (!student) {
+            return response.status(401).json({
+                message: "Invalid registration number or password",
+                success: false,
+                error: true
+            });
+        }
+
+        return response.status(200).json({
+            level: student.level,
+            success: true,
+            error: false
+        });
+
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message,
+            success: false
+        });
+    }
+}
