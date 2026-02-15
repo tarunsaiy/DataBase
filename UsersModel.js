@@ -7,7 +7,8 @@ const StudentSchema = new mongoose.Schema({
         type : String
     },
     level : {
-        type : Number
+        type : Number,
+        default : 1
     }
 }, {timestamps: true});
 const StudentModel = mongoose.model('Student', StudentSchema);
