@@ -125,7 +125,7 @@ export async function postLevel(request, response) {
     try {
         const { level, redgNo, password } = request.body;
 
-        const student = await StudentModel.findOneAndUpdate(
+        const student = await UsersModel.findOneAndUpdate(
             { number: redgNo, password: password },
             { level: level },
             { new: true }
@@ -158,7 +158,7 @@ export async function getLevel(request, response) {
     try {
         const { redgNo, password } = request.query;
 
-        const student = await StudentModel.findOne({
+        const student = await UsersModel.findOne({
             number: redgNo,
             password: password
         });
