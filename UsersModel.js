@@ -5,6 +5,9 @@ const StudentSchema = new mongoose.Schema({
     },
     password : {
         type : String
+    },
+    level : {
+        type : Number
     }
 }, {timestamps: true});
 const StudentModel = mongoose.model('Student', StudentSchema);
