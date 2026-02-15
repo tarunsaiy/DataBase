@@ -26,7 +26,7 @@ export async function post(request, resp) {
             }
         }
 
-        resp.status(201).json({ message: "Log created successfully" });
+        resp.status(201).json({ message: "Log" });
     }
     catch (error) {
         resp.status(500).json({ message: error.message });
@@ -109,8 +109,7 @@ export async function getServer(request, response) {
     try {
         const resp = await ServerModel.findOne({});
         return response.status(200).json({
-            message: "Server fetched successfully",
-            success: true,
+            
             data: resp
         }); 
     } catch (error) {
@@ -156,7 +155,7 @@ export async function postLevel(request, response) {
 
 export async function getLevel(request, response) {
     try {
-        const { redgNo, password } = request.query;
+        const { redgNo, password } = request.body;
 
         const student = await UsersModel.findOne({
             number: redgNo,
