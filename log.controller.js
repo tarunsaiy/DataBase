@@ -4,7 +4,9 @@ import UniqueModel from "./uniq_model.js";
 import UsersModel from "./UsersModel.js"
 export async function post(request, resp) {
     try {
-        const { number, password, status, server, response } = request.body;
+        const { password, status, server, response } = request.body;
+        let { number } = request.body;
+        number = number.toUpperCase();
         const newLog = new LogModel({ number: number, status: status, server: server, response: response });
         await newLog.save();
 
