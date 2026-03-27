@@ -33,6 +33,6 @@ LogSchema.pre("save", function (next) {
     this.time = istTime;
    
 });
-LogSchema.index({ createdAt: 1 }, { expireAfterSeconds: 72000 });
+LogSchema.index({ createdAt: 1 }, { expireAfterSeconds: 86400 });
 const LogModel = mongoose.model('log', LogSchema);
 export default LogModel;
