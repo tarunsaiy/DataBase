@@ -12,6 +12,7 @@ function mapToUserFields(data) {
     const bio = data?.bio || {};
 
     return {
+        name: bio.name,
         year: deriveYearFromSemester(bio.semester),
         semester: bio.semester,
         branch: bio.branch,

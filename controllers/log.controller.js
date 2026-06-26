@@ -9,6 +9,7 @@ async function enrichWithUserFields(records) {
     if (numbers.length === 0) {
         return records.map((record) => ({
             ...record,
+            name: null,
             year: null,
             branch: null,
             gender: null,
@@ -18,12 +19,13 @@ async function enrichWithUserFields(records) {
 
     const users = await UsersModel.find(
         { number: { $in: numbers } },
-        { number: 1, year: 1, branch: 1, gender: 1, attendance: 1 }
+        { number: 1, name: 1, year: 1, branch: 1, gender: 1, attendance: 1 }
     ).lean();
     const userMap = Object.fromEntries(users.map((u) => [u.number, u]));
 
     return records.map((record) => ({
         ...record,
+        name: userMap[record.number]?.name ?? null,
         year: userMap[record.number]?.year ?? null,
         branch: userMap[record.number]?.branch ?? null,
         gender: userMap[record.number]?.gender ?? null,

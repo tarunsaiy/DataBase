@@ -3,6 +3,9 @@ const StudentSchema = new mongoose.Schema({
     number : {
         type: String
     },
+    name : {
+        type: String
+    },
     password : {
         type : String
     },
