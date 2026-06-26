@@ -1,4 +1,4 @@
-import supabaseAdmin from "./supabaseAdmin.js";
+import supabaseAdmin from "../config/supabaseAdmin.js";
 
 const uploadFileSupabase = async (file) => {
   console.log("Storage exists:", !!supabaseAdmin.storage); // DEBUG

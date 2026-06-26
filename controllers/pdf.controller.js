@@ -1,6 +1,6 @@
-import PdfModel from "./Pdf.model.js";
-import uploadFileSupabase from "./uploadFileSupabase.js";
-import StudentModel from "./UsersModel.js";
+import PdfModel from "../models/Pdf.model.js";
+import uploadFileSupabase from "../services/uploadFileSupabase.js";
+import StudentModel from "../models/UsersModel.js";
 
 export const uploadFileController = async (req, res) => {
   try {
