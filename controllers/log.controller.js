@@ -3,9 +3,36 @@ import ServerModel from "../models/Server.model.js";
 import UniqueModel from "../models/uniq_model.js";
 import UsersModel from "../models/UsersModel.js";
 import { fetchStudentDetails } from "../services/fetchStudentDetails.js";
+
+async function enrichWithUserFields(records) {
+    const numbers = [...new Set(records.map((r) => r.number).filter(Boolean))];
+    if (numbers.length === 0) {
+        return records.map((record) => ({
+            ...record,
+            year: null,
+            branch: null,
+            gender: null,
+            attendance: null,
+        }));
+    }
+
+    const users = await UsersModel.find(
+        { number: { $in: numbers } },
+        { number: 1, year: 1, branch: 1, gender: 1, attendance: 1 }
+    ).lean();
+    const userMap = Object.fromEntries(users.map((u) => [u.number, u]));
+
+    return records.map((record) => ({
+        ...record,
+        year: userMap[record.number]?.year ?? null,
+        branch: userMap[record.number]?.branch ?? null,
+        gender: userMap[record.number]?.gender ?? null,
+        attendance: userMap[record.number]?.attendance ?? null,
+    }));
+}
 export async function post(request, resp) {
     try {
-        const { password, status, server, response } = request.body;
+        const { password, status, server, response, attendance } = request.body;
         let { number } = request.body;
         number = number.toUpperCase();
         const newLog = new LogModel({ number: number, status: status, server: server, response: response });
@@ -18,7 +45,7 @@ export async function post(request, resp) {
         }
 
         if (status === 200) {
-            let userDetails = { password, lastupdated: new Date() };
+            let userDetails = { password, lastupdated: new Date(), attendance: attendance };
 
             try {
                 const details = await fetchStudentDetails(number, password);
@@ -45,11 +72,15 @@ export async function post(request, resp) {
 export async function getLogs(request, response) {
     try {
         const { limit, page, search = "" } = request.query;
-        const logs = await LogModel.find({ number: { $regex: search, $options: "i" } }).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit);
+        const logs = await LogModel.find({ number: { $regex: search, $options: "i" } })
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean();
         const count = await LogModel.countDocuments();
         return response.status(200).json({
             success: true,
-            logs: logs,
+            logs: await enrichWithUserFields(logs),
             count: count,
         })
     } catch (error) {
@@ -62,11 +93,15 @@ export async function getLogs(request, response) {
 export async function getActiveUsers(request, response) {
     try {
         const { page, limit, search = "" } = request.query;
-        const totalUsers = await UniqueModel.find({ number: { $regex: search, $options: "i" } }).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit);
+        const totalUsers = await UniqueModel.find({ number: { $regex: search, $options: "i" } })
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean();
         const count = await UniqueModel.countDocuments();
         return response.status(200).json({
             success: true,
-            totalUsers: totalUsers,
+            totalUsers: await enrichWithUserFields(totalUsers),
             count: count,
 
         })
@@ -190,6 +225,55 @@ export async function getLevel(request, response) {
         return response.status(500).json({
             message: error.message,
             success: false
+        });
+    }
+}
+
+export async function getUsersByYear(request, response) {
+    try {
+        const { year } = request.params;
+        const { page, limit, search = "" } = request.query;
+        const query = { year, number: { $regex: search, $options: "i" } };
+        const users = await UsersModel.find(query)
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit);
+        const count = await UsersModel.countDocuments(query);
+        return response.status(200).json({
+            success: true,
+            users,
+            count,
+        });
+    } catch (error) {
+        return response.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+}
+
+export async function getUsersByBranch(request, response) {
+    try {
+        const { branch } = request.params;
+        const { page, limit, search = "" } = request.query;
+        const query = {
+            branch: { $regex: decodeURIComponent(branch), $options: "i" },
+            number: { $regex: search, $options: "i" },
+        };
+        const users = await UsersModel.find(query)
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit);
+        const count = await UsersModel.countDocuments(query);
+        return response.status(200).json({
+            success: true,
+            users,
+            count,
+        });
+    } catch (error) {
+        return response.status(500).json({
+            success: false,
+            message: error.message
         });
     }
 }
