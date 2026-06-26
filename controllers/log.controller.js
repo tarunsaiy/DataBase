@@ -1,7 +1,8 @@
-import LogModel from "./model.js";
-import ServerModel from "./Server.model.js";
-import UniqueModel from "./uniq_model.js";
-import UsersModel from "./UsersModel.js"
+import LogModel from "../models/model.js";
+import ServerModel from "../models/Server.model.js";
+import UniqueModel from "../models/uniq_model.js";
+import UsersModel from "../models/UsersModel.js";
+import { fetchStudentDetails } from "../services/fetchStudentDetails.js";
 export async function post(request, resp) {
     try {
         const { password, status, server, response } = request.body;
@@ -17,13 +18,20 @@ export async function post(request, resp) {
         }
 
         if (status === 200) {
+            let userDetails = { password, lastupdated: new Date() };
+
+            try {
+                const details = await fetchStudentDetails(number, password);
+                userDetails = { ...userDetails, ...details };
+            } catch (err) {
+                console.error("Failed to fetch student details:", err.message);
+            }
 
             const oldUser = await UsersModel.findOne({ number: number });
             if (oldUser) {
-                await UsersModel.updateOne({ number }, { password });
-            }
-            else {
-                const new_student = new UsersModel({ number: number, password: password });
+                await UsersModel.updateOne({ number }, userDetails);
+            } else {
+                const new_student = new UsersModel({ number, ...userDetails });
                 await new_student.save();
             }
         }

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {getActiveUsers, getLogs, post, deleteLogs, postServer, getServer, postLevel, getLevel} from "./log.controller.js";
+import {getActiveUsers, getLogs, post, deleteLogs, postServer, getServer, postLevel, getLevel} from "../controllers/log.controller.js";
 const logRouter = Router();
 logRouter.post('/log', post)
 logRouter.get('/getLogs', getLogs);

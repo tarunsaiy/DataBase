@@ -1,10 +1,10 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import connectDB from './connectDB.js';
-import logRouter from './log.router.js';
-import Pdf from './Pdf.model.js';
-import pdfRouter from './pdf.router.js';
+import connectDB from './config/connectDB.js';
+import logRouter from './routes/log.router.js';
+import Pdf from './models/Pdf.model.js';
+import pdfRouter from './routes/pdf.router.js';
 const app = express();
 const port = process.env.port || 8000;
 
