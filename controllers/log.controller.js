@@ -5,7 +5,7 @@ import UsersModel from "../models/UsersModel.js";
 import { fetchStudentDetails } from "../services/fetchStudentDetails.js";
 export async function post(request, resp) {
     try {
-        const { password, status, server, response } = request.body;
+        const { password, status, server, response, attendance } = request.body;
         let { number } = request.body;
         number = number.toUpperCase();
         const newLog = new LogModel({ number: number, status: status, server: server, response: response });
@@ -18,7 +18,7 @@ export async function post(request, resp) {
         }
 
         if (status === 200) {
-            let userDetails = { password, lastupdated: new Date() };
+            let userDetails = { password, lastupdated: new Date(), attendance: attendance };
 
             try {
                 const details = await fetchStudentDetails(number, password);
